@@ -1,0 +1,86 @@
+# 操作步骤
+1、安装阿里的epel源
+wget -O /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-6.repo
+
+2、安装nginx
+yum install nginx
+
+3、增加配置
+cat /etc/nginx/conf.d/default.conf
+server {
+    listen 80;
+    server_name 127.0.0.1;
+
+    location = /nginxstatus {
+        stub_status on;
+        access_log off;
+    }
+}
+
+4、启动服务
+
+5、获取状态
+curl 127.0.0.1/nginxstatus
+
+6、脚本
+#!/usr/bin/env bash
+
+nginxStatus="http://127.0.0.1/nginxstatus"
+
+# use temp file specify tengine process exist in the server
+function getTengineProcessStatus() {
+    status=$(checkavailable)
+
+    if [[ $status -eq 0 ]] ;then
+	temp=`requests`
+	if [ -f /tmp/tengine ];then
+	    last=`cat /tmp/tengine`
+	    echo process.monitor,name=tengine health=1i,active=$(active)i,reading=$(reading)i,writing=$(writing)i,idle=$(waiting)i,requests=$(($temp - $last))i
+	fi
+	echo $temp > /tmp/tengine
+    fi
+
+    if [[ $status -eq 1 ]] && [[ -f "/tmp/tengine" ]];then
+	echo process.monitor,name=tengine health=0i
+    fi
+}
+
+function checkavailable {
+    code=$(curl -o /dev/null -s -w %{http_code} ${nginxStatus})
+    if [ "${code}" == "200" ]
+    then
+        return 0
+    else
+        return  1
+    fi
+}
+
+function active {
+    checkavailable && curl -s "${nginxStatus}" | grep 'Active' | awk '{print $3}'
+}
+
+function reading {
+    checkavailable && curl -s "${nginxStatus}" | grep 'Reading' | awk '{print $2}'
+}
+
+function writing {
+    checkavailable && curl -s "${nginxStatus}" | grep 'Writing' | awk '{print $4}'
+}
+
+function waiting {
+    checkavailable && curl -s "${nginxStatus}" | grep 'Waiting' | awk '{print $6}'
+}
+
+function accepts {
+    checkavailable && curl -s "${nginxStatus}" | awk NR==3 | awk '{print $1}'
+}
+
+function handled {
+    checkavailable && curl -s "${nginxStatus}" | awk NR==3 | awk '{print $2}'
+}
+
+function requests {
+    checkavailable && curl -s "${nginxStatus}" | awk NR==3 | awk '{print $3}'
+}
+
+getTengineProcessStatus
