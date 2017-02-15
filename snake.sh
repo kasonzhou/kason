@@ -28,14 +28,14 @@ game_start=(
     '                                                 '
 );
 
-snake_exit() {  #退出游戏
-    stty echo;  #恢复回显
-    tput rmcup; #恢复屏幕
-    tput cvvis; #恢复光标
+snake_exit() {  # exit game
+    stty echo;  # recovery display
+    tput rmcup; # recovery screen
+    tput cvvis; # recovery cursor
     exit 0;
 }
 
-draw_gui() {                                  # 画边框 
+draw_gui() {                                  # Draw Border
     clear;
     color="\e[34m*\e[0m";
     for (( i = 0; i < $1; i++ )); do
@@ -54,24 +54,24 @@ draw_gui() {                                  # 画边框
 }
 
 snake_init() {
-    Lines=`tput lines`; Cols=`tput cols`;     #得到屏幕的长宽
-    xline=$((Lines/2)); ycols=4;              #开始的位置
-    xscore=$Lines;      yscore=$((Cols/2));   #打印分数的位置
-    xcent=$xline;       ycent=$yscore;        #中心点位置
-    xrand=0;            yrand=0;              #随机点 
-    sumscore=0;         liveflag=1;           #总分和点存在标记
-    sumnode=0;          foodscore=0;          #总共要加长的节点和点的分数
+    Lines=`tput lines`; Cols=`tput cols`;     #
+    xline=$((Lines/2)); ycols=4;              #starting location
+    xscore=$Lines;      yscore=$((Cols/2));   #score location
+    xcent=$xline;       ycent=$yscore;        #center location
+    xrand=0;            yrand=0;              #random 
+    sumscore=0;         liveflag=1;           #sumscore
+    sumnode=0;          foodscore=0;          #sumnode
     
-    snake="0000 ";                            #初始化贪吃蛇
-    pos=(right right right right right);      #开始节点的方向
-    xpt=($xline $xline $xline $xline $xline); #开始的各个节点的x坐标
-    ypt=(5 4 3 2 1);                          #开始的各个节点的y坐标
-    speed=(0.05 0.1 0.15);  spk=${spk:-1};    #速度 默认速度
+    snake="0000 ";                            #init snak
+    pos=(right right right right right);      #init direction
+    xpt=($xline $xline $xline $xline $xline); #init x
+    ypt=(5 4 3 2 1);                          #init y
+    speed=(0.05 0.1 0.15);  spk=${spk:-1};    #init speed
 
     draw_gui $((Lines-1)) $Cols
 }
 
-game_pause() {                                #暂定游戏
+game_pause() {                                #pause
     echo -en "\033[$Lines;$((Cols-50))H\e[33mGame paused, Use space or enter key to continue\e[0m";
     while read -n 1 space; do
         [[ ${space:-enter} = enter ]] && \
@@ -80,8 +80,8 @@ game_pause() {                                #暂定游戏
     done
 }
 
-# $1 节点位置 
-update() {                                    #更新各个节点坐标
+# $1 
+update() {                                    #update x and y
     case ${pos[$1]} in
         right) ((ypt[$1]++));;
          left) ((ypt[$1]--));;
@@ -90,7 +90,7 @@ update() {                                    #更新各个节点坐标
     esac
 }
 
-ch_speed() {                                  #更新速度
+ch_speed() {                                  #update speed
      [[ $# -eq 0 ]] && spk=$(((spk+1)%3));
      case $spk in
          0) temp="Fast  ";;
@@ -100,7 +100,7 @@ ch_speed() {                                  #更新速度
      echo -ne "\033[$Lines;3H\e[33mSpeed: $temp\e[0m";
 }
 
-Gooooo() {                                   #更新方向
+Gooooo() {                                   #update go
     case ${key:-enter} in
         s|W) [[ ${pos[0]} != "up"    ]] && pos[0]="down";;
         w|W) [[ ${pos[0]} != "down"  ]] && pos[0]="up";;
@@ -112,7 +112,7 @@ Gooooo() {                                   #更新方向
     esac
 }
 
-add_node() {                                 #增加节点
+add_node() {                                 #add node
     snake="0$snake";
     pos=(${pos[0]} ${pos[@]});
     xpt=(${xpt[0]} ${xpt[@]});
@@ -120,7 +120,7 @@ add_node() {                                 #增加节点
     update 0;
 
     local x=${xpt[0]} y=${ypt[0]}
-    (( ((x>=$((Lines-1)))) || ((x<=1)) || ((y>=Cols)) || ((y<=1)) )) && return 1; #撞墙
+    (( ((x>=$((Lines-1)))) || ((x<=1)) || ((y>=Cols)) || ((y<=1)) )) && return 1; #die
 
     for (( i = $((${#snake}-1)); i > 0; i-- )); do
         (( ${xpt[0]} == ${xpt[$i]} && ${ypt[0]} == ${ypt[$i]} )) && return 1; #crashed
@@ -130,7 +130,7 @@ add_node() {                                 #增加节点
     return 0;
 }
 
-mk_random() {                               #产生随机点和随机数
+mk_random() {                               #random
     xrand=$((RANDOM%(Lines-3)+2));
     yrand=$((RANDOM%(Cols-2)+2));
     foodscore=$((RANDOM%9+1));
@@ -139,7 +139,7 @@ mk_random() {                               #产生随机点和随机数
     liveflag=0;
 }
 
-new_game() {                                #重新开始新游戏
+new_game() {                                #restart the game
     snake_init;
     while true; do
         read -t ${speed[$spk]} -n 1 key;
@@ -163,7 +163,7 @@ new_game() {                                #重新开始新游戏
         fi
 
         local x=${xpt[0]} y=${ypt[0]}
-        (( ((x>=$((Lines-1)))) || ((x<=1)) || ((y>=Cols)) || ((y<=1)) )) && return 1; #撞墙
+        (( ((x>=$((Lines-1)))) || ((x<=1)) || ((y>=Cols)) || ((y<=1)) )) && return 1; #die
 
         (( x==xrand && y==yrand )) && ((liveflag=1)) && ((sumnode+=foodscore)) && ((sumscore+=foodscore));
 
@@ -205,11 +205,11 @@ print_game_start() {
 
 game_main() {
     trap 'snake_exit;' SIGTERM SIGINT; 
-    stty -echo;                               #取消回显
-    tput civis;                               #隐藏光标
-    tput smcup; clear;                        #保存屏幕并清屏
+    stty -echo;                               #cansel display
+    tput civis;                               # hide cursor
+    tput smcup; clear;                        # save screen and clean screen
 
-    print_game_start;                         #开始游戏 
+    print_game_start;                         # start 
 }
 
 game_main;

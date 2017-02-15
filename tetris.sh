@@ -7,8 +7,8 @@
 #
 
 # const value
-#======================================固定值================================#
-BXLINES=3;  BXCOLNS=6;  # 小方块的高和宽
+#======================================fixed value================================#
+BXLINES=3;  BXCOLNS=6;  
 MAPX=20;    MAPY=10;
 NAME=('I' 'S' 'Z' 'L' 'J' 'T' 'O');
 FLAG=('2' '2' '2' '4' '4' '4' '1');
@@ -73,37 +73,37 @@ start_game=(
     '                                                 '
 );
 
-blockarr=(); #记录name 和 flag
-keyarray=(); #记录按键
+blockarr=(); #record name 和 flag
+keyarray=(); #record key-press
 #------------------------------------------------------------------------#
 
 #========================================================================#
 game_init() { # game_init
-    SCLINES=`tput lines`;       # 屏幕的高
-    SCCOLNS=`tput cols`;        # 屏幕的宽
+    SCLINES=`tput lines`;       # height of your screen
+    SCCOLNS=`tput cols`;        # width of your screen
 
-#主框的属性
-    mainw=59;               mainh=60;                   # 主框的宽和高
-    mainctx=0;              maincty=4;                  # 主框中心打印点
-    upx=$((SCLINES-62));    dnx=$((SCLINES-1));         # 界面的上下 x
-    lty=$((SCCOLNS/2-50));  rty=$((lty+61));            # 界面的左右 y
+#mainframe 
+    mainw=59;               mainh=60;                   # height width
+    mainctx=0;              maincty=4;                  # 
+    upx=$((SCLINES-62));    dnx=$((SCLINES-1));         # x
+    lty=$((SCCOLNS/2-50));  rty=$((lty+61));            # y
 
-#next的属性
-    nextw=40;           nexth=16;                 # next框的高和宽
-    ntx=$((upx));       nty=$((rty+2));           # next框的位置
-    ntctx=$((ntx+5));   ntcty=$((nty+12));        # next框的中心打印位置
+#next
+    nextw=40;           nexth=16;                 # next heigh width
+    ntx=$((upx));       nty=$((rty+2));           # next location
+    ntctx=$((ntx+5));   ntcty=$((nty+12));        # next center location
 
-#score的属性
+#score 
     scorw=$nextw;       scorh=5;
     scx=$((ntx+20));    scy=$((nty));
     scctx=$((scx+4));   sccty=$((scy+19));
 
-#level的属性
+#level
     levew=$nextw;       leveh=5;
     lvx=$((scx+9));     lvy=$((scy));
     lvctx=$((lvx+4));   lvcty=$((lvy+20));
 
-#help的属性
+#help
     helpw=$nextw;       helph=21;
     hpx=$((lvx+10));    hpy=$((nty));
     hpctx=$((hpx+4));   hpcty=$((hpy+10));
@@ -114,7 +114,7 @@ MAP=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
      0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
      0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
      0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-    ); #所有的格子
+    ); 
 
 #paint_gui
     clear; paint_gui;
@@ -123,12 +123,12 @@ MAP=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
     name=${NAME[$((x))]};  
     flag=$((RANDOM%FLAG[$x]+1)); 
 
-    nname='I'; nflag=2; #下一个方块
+    nname='I'; nflag=2; #next graph
 
-    centerx=$mainctx; #每个图形的中心打印点
+    centerx=$mainctx; #
     centery=$maincty;
 
-#各个方块的相对坐标
+#
     ax="Iax"; ay="Iay";
 }
 #------------------------------------------------------------------------#
@@ -142,8 +142,8 @@ game_exit() {
     exit 0;
 }
 
-#============================三个原子函数paint_block, erase_block, paint_box=================
-#打印一个小方块, 四个参数， 两个位置和两个颜色
+#============================paint_block, erase_block, paint_box=================
+
 paint_block() {
     local x=$1 y=$2 crone=$3 crtwo=$4 i
 
@@ -155,7 +155,7 @@ paint_block() {
     echo -ne "\033[$((x+2));$((y))H\e[${crone}m+---+\e[0m";
 }
 
-#删除一个小方块, 两个参数，即位置
+#
 erase_block() {
     local x=$1 y=$2
 
@@ -167,7 +167,7 @@ erase_block() {
     echo -ne "\033[$((x+2));$((y))H     ";
 }
 
-#画一个盒子$1 $2 $3 $4 $5
+#$1 $2 $3 $4 $5
 paint_box() {
     local x=$1 y=$2 w=$3 h=$4 color=$5 i
 
@@ -187,17 +187,17 @@ paint_box() {
 }
 #---------------------------------------------------------------------------------------
 
-#打印界面
+#
 paint_gui() {
     ((upx<=0 || lty<=0)) && game_exit 1;
 
-    paint_box $upx $lty $mainw $mainh 34; #画主框
-    paint_box $ntx $nty $nextw $nexth 33; #画next框
-    paint_box $lvx $lvy $levew $leveh 32; #画level框
-    paint_box $scx $scy $scorw $scorh 36; #画分数框
-    paint_box $hpx $hpy $helpw $helph 31; #画帮助框
+    paint_box $upx $lty $mainw $mainh 34; #
+    paint_box $ntx $nty $nextw $nexth 33; #
+    paint_box $lvx $lvy $levew $leveh 32; #
+    paint_box $scx $scy $scorw $scorh 36; #
+    paint_box $hpx $hpy $helpw $helph 31; #
 
-#打印score, help 等提示字符
+#print score, help
     echo -ne "\033[$((ntx+2));$((nty+17))H\e[34mN E X T\e[0m";
 
     echo -ne "\033[$((scx+2));$((scy+16))H\e[31mS C O R E\e[0m";
@@ -220,7 +220,7 @@ paint_gui() {
 
 #---------------------------------------------------------
 
-#在next框中打印下一个方块图形
+#
 paint_next() {
     (($#==0)) && mk_random;
     local oflag=$flag oname=$name
@@ -234,7 +234,7 @@ paint_next() {
     centerx=$mainctx; centery=$maincty;
 }
 
-# 打印分数和level
+# 
 paint_score() {
     level=0;
     echo -ne "\033[$((scctx));$((sccty))H\e[31m$score\e[0m";
@@ -249,7 +249,7 @@ paint_score() {
     echo -ne "\033[$((lvctx));$((lvcty))H\e[31m$level\e[0m";
 }
 
-#根据name选择要打印的方块
+#
 paint_x() {
     local x=$centerx y=$centery i
     local n=$((${mapname[$name]}-1));
@@ -260,7 +260,7 @@ paint_x() {
     done
 }
 
-#根据name选择要删除的方块
+#
 erase_x() {
     local x=$centerx y=$centery i
 
@@ -280,11 +280,11 @@ rotate_x() {
 update() { #update the map
     local x=$1 n=0 i j
     for (( i = 0; i < MAPY; i++ )); do
-        erase_block $x $i;              #消掉一行
-        MAP[$((x*MAPY+i))]=0;           #更新为0
+        erase_block $x $i;              #
+        MAP[$((x*MAPY+i))]=0;           #
     done
 
-    #将上面的格子向下移动一行
+    #
     for (( i = 0; i < MAPY; i++ )); do
         for (( j = x; j > 0; j-- )); do
             ((n=MAP[$(((j-1)*MAPY+i))])); 
@@ -295,7 +295,7 @@ update() { #update the map
         done
     done
 
-    # 更新MAP的值
+    # 
     for (( i = 0; i < MAPY; i++ )); do
         for (( j = x; j >0; j-- )); do
             MAP[$((j*MAPY+i))]=$((MAP[$(((j-1)*MAPY+i))]));
@@ -303,14 +303,14 @@ update() { #update the map
     done
 }
 
-# 检测是否可以消掉一行
+#
 have_score() {
     local n=0 i j;
     for (( i = 0; i < MAPX; i++ )); do
         for (( j = 0; j < MAPY; j++ )); do
-            ((MAP[$((10*i+j))]==0)) && break; #有空格就退出
+            ((MAP[$((10*i+j))]==0)) && break; #
         done
-        ((j==MAPY)) && ((n+=1)) && update $i;    #可以消掉一行
+        ((j==MAPY)) && ((n+=1)) && update $i;    #
     done
 
     case $n in
@@ -321,7 +321,7 @@ have_score() {
     esac
 }
 
-#根据flag 和 name找到其的坐标数组
+#
 find_array() {
     case $flag in
         1) ax="${name}ax"; ay="${name}ay";
@@ -335,29 +335,29 @@ find_array() {
     esac
 }
 
-# 检测方块首次出现时,是否会越界,并作出矫正或者游戏结束
+# 
 check_first() { 
     local x=$centerx y=$centery minx=0 i
 
     find_array;
-# 检测是否越界
+# 
     for (( i = 0; i < 4; i++ )); do
         (((x+${ax}[$i])<minx)) && ((minx=(x+${ax}[$i])));
     done
     ((centerx-=minx));
-    paint_x;  #开始打印方块
+    paint_x;  #
     paint_score;
 
-# 检测是否会结束游戏
+# 
     for (( i = 0; i < 4; i++ )); do
         ((x=centerx+${ax}[$i])); ((y=centery+${ay}[$i]))
-        ((MAP[$((x*10+y))]!=0)) && return 1; #游戏结束
+        ((MAP[$((x*10+y))]!=0)) && return 1; #
     done
  
     return 0;
 }
 
-#检测是否可以固定方块
+#
 check_stop() {
     local sx=$centerx sy=$centery
     local x=0 y=0 n=0 i=0
@@ -365,11 +365,11 @@ check_stop() {
     find_array;
     for (( i = 0; i < 4; i++ )); do
         ((x=(sx+${ax}[$i]))); ((y=(sy+${ay}[$i])));
-        ((x+1>19)) && break; #到底
-        ((MAP[$((10*(x+1)+y))] != 0)) && break; #有方块挡住
+        ((x+1>19)) && break; #
+        ((MAP[$((10*(x+1)+y))] != 0)) && break; #
     done
     
-    if ((i!=4)); then #不能在动了，则记录
+    if ((i!=4)); then #
         for (( i = 0; i < 4; i++ )); do
             ((x=(sx+${ax}[$i]))); ((y=(sy+${ay}[$i])));
             n=$((10*x+y)); MAP[$n]=${mapname[$name]};
@@ -382,7 +382,7 @@ check_stop() {
     return 0;
 }
 
-#检测是否可以移到$1 $2这个格子
+#
 check_next() {
     local sx=$1 sy=$2 
     local x=0 y=0 n=0 i=0
@@ -392,7 +392,7 @@ check_next() {
         ((x=(sx+${ax}[$i]))); ((y=(sy+${ay}[$i])));
 
         ((x<0 || x>19 || y<0 || y>9)) && return 1; 
-        ((MAP[$((10*x+y))] != 0)) && return 1; #不能移到这个格子
+        ((MAP[$((10*x+y))] != 0)) && return 1; #
     done
 
     return 0;
@@ -400,7 +400,7 @@ check_next() {
 #------------------------------------------------------------------------#
 
 #========================================================================#
-go_left() { #向左移一个
+go_left() { #
     check_next $centerx $((centery-1));
     (($?==1)) && return 1;
 
@@ -408,7 +408,7 @@ go_left() { #向左移一个
     return 0;
 }
     
-go_right() { #向右移一格
+go_right() { #
     check_next $centerx $((centery+1));
     (($?==1)) && return 1;
 
@@ -416,7 +416,7 @@ go_right() { #向右移一格
     return 0;
 }
 
-go_down() { #加速向下
+go_down() { #
     check_next $((centerx+1)) $centery
     (($?==1)) && return 1;
 
@@ -424,8 +424,8 @@ go_down() { #加速向下
     return 0;
 }
 
-go_rotate() { #旋转
-    local oflag=$flag #保存原来的flag值
+go_rotate() { #
+    local oflag=$flag #
 
     rotate_x;
     check_next $centerx $centery;
@@ -437,7 +437,7 @@ go_rotate() { #旋转
     return 0;
 }
 
-go_fast() { #快速固定
+go_fast() { #
     erase_x;
     check_next $((centerx+1)) $centery
     local res=$?;
@@ -460,19 +460,19 @@ game_pause() {
     echo -ne "\033[$((hpctx+17));$((hpcty+5))H\e[31m           \e[0m";
 }
         
-# 根据按键作出选择
+# 
 keypress() {
     local result=0;
     case ${key:-space} in
-        H|h) go_left;   result=$?; # 向左一个格子
+        H|h) go_left;   result=$?; # 
             ;;
-        J|j) go_down;   result=$?; # 向下, 加速向下一个格子
+        J|j) go_down;   result=$?; # 
             ;;
-        K|k) go_rotate; result=$?; # 向上, 旋转90度
+        K|k) go_rotate; result=$?; # 90
             ;;
-        L|l) go_right;  result=$?; # 向右一个格子
+        L|l) go_right;  result=$?; #
             ;;
-        Q|q) game_exit; # 退出游戏
+        Q|q) game_exit; # 
             ;;
         P|p) game_pause;
             ;;
@@ -485,27 +485,27 @@ keypress() {
 #----------------------------------------------------------------#
 
 #================================================================#
-mk_random() { # 产生下一个随机方块
+mk_random() { #
     local x=$((RANDOM%7))
 
     nname=${NAME[$x]};
     nflag=$((RANDOM%FLAG[$x]+1));
 }
 
-#开始一个新游戏
+#
 new_game() {
     local i gmover=0 nextbk=0;
 
-    game_init; #初始化游戏
+    game_init; #
     while true; do
-        paint_next; #在next框中打印下一个方块
+        paint_next; #
         blockarr+=($name $flag $nname $nflag);
 
-        check_first; (($?==1)) && return; #检查是否游戏结束
+        check_first; (($?==1)) && return; #
 
         while true; do
             for (( i = 0; i < TIME; i++ )); do
-                read -n 1 -t 0.1 key; #等待按键
+                read -n 1 -t 0.1 key; #
                 (($?==0)) && keypress; 
                 (($?==0)) && keyarray+=(${key:-space});
                 (($?==0)) || keyarray+=("nothing");
@@ -594,8 +594,8 @@ game_start() {
     tput smcup; clear;
     trap 'game_exit;' SIGINT SIGTERM
 
-    score=0; #总分数
-    level=1; #等级
+    score=0; #
+    level=1; #
     TIME=9;
 
     local xcent=$(tput lines) ycent=$(tput cols)
